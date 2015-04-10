@@ -41,6 +41,6 @@ func main() {
 
 	}))
 
-	consumer.ConnectToNSQD(os.Getenv("NSQ_ADDRESS"))
+	consumer.ConnectToNSQD(os.Getenv("NSQ_TCP_ADDRESS"))
 	<-make(chan bool)
 }

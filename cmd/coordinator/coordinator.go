@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/bitly/go-nsq"
@@ -279,7 +280,10 @@ func (n *onDemandProducer) Start() {
 var startAt uint64
 
 func main() {
-	mgs, err := mgo.Dial("localhost")
+	mongoAddress := os.Getenv("MONGO_PORT_27017_TCP_ADDR")
+	mongoPort := os.Getenv("MONGO_PORT_27017_TCP_PORT")
+
+	mgs, err := mgo.Dial(mongoAddres + ":" + mongoPort)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -287,7 +291,7 @@ func main() {
 
 	coord := &coordinator{mgs}
 
-	stats := NewOnDemandProducer("http://localhost:4151", 0, func(s Stats) {
+	stats := NewOnDemandProducer(os.Getenv("NSQ_HTTP_ADDRESS"), 0, func(s Stats) {
 		rdy := s.CombinedReadyCount("batches", "worker")
 		if rdy > 0 {
 			cfg := nsq.NewConfig()
